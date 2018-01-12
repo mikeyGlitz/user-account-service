@@ -1,0 +1,45 @@
+{
+  "name": "chat-example",
+  "version": "0.0.0",
+  "main": "server.js",
+  "author": "Michael Glitzos <michael.glitzos@gmail.com>",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ./{src,__tests__}/**/*.js",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "./{src,__tests__}/**/*.js": "eslint"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/.c9/",
+      "/node_modules/"
+    ],
+    "transform": {
+      "\\.js$": "babel-jest"
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "mongoose": "^4.13.9",
+    "password-sheriff": "^1.1.0",
+    "validator": "^9.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-jest": "^22.0.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-airbnb": "^2.4.0",
+    "casual": "^1.5.19",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "husky": "^0.14.3",
+    "jest": "^22.0.6",
+    "lint-staged": "^6.0.0",
+    "mockingoose": "^2.5.0"
+  }
+}
