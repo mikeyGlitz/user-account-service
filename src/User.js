@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
-import { isEmail } from 'validator';
 import bcrypt from 'bcryptjs';
+import mongoose, { Schema } from 'mongoose';
+import { PasswordPolicy, charsets } from 'password-sheriff';
+import { isEmail } from 'validator';
 
 
 const User = new Schema({
@@ -19,8 +20,36 @@ const User = new Schema({
   password: { type: String, required: true },
 });
 
-const SALT_FACTOR = 12;
+class ValidationError extends Error {
+  constructor(...params) {
+    super(...params);
+    this.name = 'ValidationError';
+  }
+}
 
+const policy = new PasswordPolicy({
+  length: { minLength: 8 },
+  identicalChars: {
+    max: 2,
+  },
+  contains: {
+    expressions: [
+      charsets.lowerCase,
+      charsets.upperCase,
+      charsets.numbers,
+      charsets.specialCharacters,
+    ],
+  },
+});
+
+User.pre('save', function validatePassword(next) {
+  const user = this;
+  if (!user.isModified('password')) return next();
+  if (!policy.check(user.password)) return next(new ValidationError('Invalid Password'));
+  return next();
+});
+
+const SALT_FACTOR = 12;
 User.pre('save', function encryptPassword(next) {
   const user = this;
   if (!user.isModified('password')) return next();

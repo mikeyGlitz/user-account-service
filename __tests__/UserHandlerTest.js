@@ -5,20 +5,21 @@ import bcrypt from 'bcryptjs';
 import { registerUser, loginUser } from '../src/UserHandler';
 
 
-const lowerCase = casual.random_element('abcdefghijklmnopqrstuvwxyz'.split(''));
-const upperCase = casual.random_element('abcdefghijklmnopqrstuvwxyz'
+const lowerCase = () => casual.random_element('abcdefghijklmnopqrstuvwxyz'.split(''));
+const upperCase = () => casual.random_element('abcdefghijklmnopqrstuvwxyz'
   .toUpperCase()
   .split(''));
-const integer = casual.integer(0, 9);
-const specialCharacter = casual.random_element(' !"#$%&\'`()[]+-,./\\@;:=<>~|?_'
+const integer = () => casual.integer(0, 9);
+const specialCharacter = () => casual.random_element(' !"#$%&\'`()[]+-,./\\@;:=<>~|?_'
   .split(''));
-const anyCharacter = casual.random_element([lowerCase, upperCase, integer, specialCharacter]);
+const anyCharacter = () =>
+  casual.random_element([lowerCase(), upperCase(), integer(), specialCharacter()]);
 
 casual.define('securePassword', () => {
   const length = casual.integer(15, 25);
-  const pw = [lowerCase, upperCase, integer, specialCharacter];
-  while (pw.length > length) {
-    pw.push(anyCharacter);
+  const pw = [lowerCase(), upperCase(), integer(), specialCharacter()];
+  while (pw.length < length) {
+    pw.push(anyCharacter());
   }
 
   return pw.join('');
@@ -32,13 +33,6 @@ casual.define('user', () => ({
   password: casual.securePassword,
   email: casual.email,
 }));
-
-class ValidationError extends Error {
-  constructor(...params) {
-    super(...params);
-    this.name = 'ValidationError';
-  }
-}
 
 class DuplicateError extends Error {
   constructor(...params) {
@@ -64,7 +58,6 @@ describe('UserHandler', () => {
 
       const resp = { status, sendStatus };
 
-      mockingoose.User.toReturn(new ValidationError(), 'save');
       registerUser(req, resp)
         .then(() => {
           expect(sendStatus.mock.calls[0][0]).toEqual(400);
@@ -85,7 +78,6 @@ describe('UserHandler', () => {
 
       const resp = { status, sendStatus };
 
-      mockingoose.User.toReturn(new ValidationError(), 'save');
       registerUser(req, resp)
         .then(() => {
           expect(sendStatus.mock.calls[0][0]).toEqual(400);
