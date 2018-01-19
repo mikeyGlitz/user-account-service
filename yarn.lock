@@ -2922,9 +2922,9 @@ minimist@~0.0.1:
   dependencies:
     minimist "0.0.8"
 
-mockingoose@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/mockingoose/-/mockingoose-2.5.0.tgz#e8172851e12de3e9c37955ff1278449ea000c876"
+mockingoose@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/mockingoose/-/mockingoose-2.6.0.tgz#68885735cb107f253bb99493aa88ddebd3e865b0"
   dependencies:
     mongoose "^4.13.9"
 

@@ -1,7 +1,9 @@
 import mockingoose from 'mockingoose';
 import casual from 'casual';
+import bcrypt from 'bcryptjs';
 
 import { registerUser, loginUser } from '../src/UserHandler';
+
 
 const lowerCase = casual.random_element('abcdefghijklmnopqrstuvwxyz'.split(''));
 const upperCase = casual.random_element('abcdefghijklmnopqrstuvwxyz'
@@ -35,6 +37,13 @@ class ValidationError extends Error {
   constructor(...params) {
     super(...params);
     this.name = 'ValidationError';
+  }
+}
+
+class DuplicateError extends Error {
+  constructor(...params) {
+    super(...params);
+    this.code = 11000;
   }
 }
 
@@ -96,14 +105,7 @@ describe('UserHandler', () => {
 
       const resp = { status, sendStatus };
 
-      class DuplicateUserError extends Error {
-        constructor(...params) {
-          super(...params);
-          this.code = 110000;
-        }
-      }
-
-      mockingoose.User.toReturn(new DuplicateUserError(), 'save');
+      mockingoose.User.toReturn(new DuplicateError(), 'save');
 
       registerUser(req, resp)
         .then(() => {
@@ -163,7 +165,8 @@ describe('UserHandler', () => {
 
       const resp = { status, sendStatus };
 
-      mockingoose.User.toReturn({ ...casual.user, comparePasswords: () => false }, 'findOne');
+      const dbUser = casual.user;
+      mockingoose.User.toReturn(dbUser, 'findOne');
       loginUser(req, resp)
         .then(() => {
           expect(sendStatus.mock.calls[0][0]).toEqual(401);
@@ -172,7 +175,10 @@ describe('UserHandler', () => {
     });
 
     it('Logs in a valid user', (done) => {
-      const req = { body: { email: casual.email, password: casual.password } };
+      /* eslint-disable prefer-destructuring */
+      const password = casual.password;
+      /* eslint-enable */
+      const req = { body: { email: casual.email, password } };
 
       const sendStatus = jest.fn();
       const status = jest.fn();
@@ -181,7 +187,11 @@ describe('UserHandler', () => {
 
       const resp = { status, sendStatus };
 
-      mockingoose.User.toReturn({ ...casual.user, comparePasswords: () => true }, 'findOne');
+      const salt = bcrypt.genSaltSync(12);
+      const dbUser = casual.user;
+      dbUser.password = bcrypt.hashSync(password, salt);
+
+      mockingoose.User.toReturn(dbUser, 'findOne');
       loginUser(req, resp)
         .then(() => {
           expect(status.mock.calls[0][0]).toEqual(200);

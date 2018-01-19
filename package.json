@@ -40,6 +40,6 @@
     "husky": "^0.14.3",
     "jest": "^22.0.6",
     "lint-staged": "^6.0.0",
-    "mockingoose": "^2.5.0"
+    "mockingoose": "^2.6.0"
   }
 }
